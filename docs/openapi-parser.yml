@@ -1,0 +1,153 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Swagger openid4vp - OpenAPI 3.0
+  description: Specific OpenAPI based on openID for VP, restricted to the Response Mode direct_post [OpenId for VP]
+  contact:
+    name: Idakto Security Team
+    email: security@idakto.com
+tags:
+  - name: internal
+    description: Path called from internal backend client
+  - name: external
+    description: Path called from external client
+  - name: pathignoredbygenerator
+    description: Code not generated
+
+paths:               
+  /internal/v1/parsevptoken:
+    get:
+      tags:
+        - internal
+      summary: Get the parsed VpToken  
+      description: Retrieve a map of claims from the provided vptoken and the specified template.
+      operationId: GetVpTokenParsed
+      parameters:
+      - name: template
+        in: query
+        content:
+          application/json:      
+            schema:
+              $ref: '#/components/schemas/Template'
+        description: a JSON template describing the structure of the document to parse
+        required: true
+
+      - name: vptoken
+        in: header
+        description: a base64URL CBOR encoded vptoken 
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+             schema:
+                $ref: '#/components/schemas/VpTokenParsed'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '../../commons/openapi.yml#/components/schemas/Error'
+
+components:
+  schemas:      
+            
+    Template:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/DoctypeTemplate'
+      description: |
+        Template is a map where the key is a string identifying the doctype and the value is a doctypeTemplate object.
+      example:
+        org.iso.18013.5.1.mDL:
+          org.iso.18013.5.1:
+            family_name:
+              format: "string"
+              output_identifier: "family_name"
+              presence: "M"
+            issue_date:
+              format: "full-date"
+              output_identifier: "issue_date"
+              presence: "O"
+              
+    DoctypeTemplate:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/NamespaceTemplate'
+      description: |
+        doctypeTemplate is a map where the key is a string identifying the namespace and the value is NamespaceTemplate object.
+    
+    NamespaceTemplate:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ClaimTemplate'
+      description: |
+        NamespaceTemplate is a map where the key is a string identifying the claim and the value is a ClaimTemplate object.
+
+    ClaimTemplate:
+      type: object
+      properties:
+        format:
+          type: string
+          enum:
+            - tstr
+            - bstr
+            - uint
+            - full-date
+            - tdate
+            - bool
+            - cbor
+            - driving-privileges
+            - iso-23220-birthdate
+          description: |
+            The format used for the claims. Possible values are:
+            - `tstr`: string
+            - `bstr`: bytes
+            - `uint`: tstr -> uint takes a string input identifier D in a date format and returns the year of the date D
+            - `full-date`: a date in full-date notation as defined by RFC 3339, section 5.6 (e.g., 2017-07-21)
+            - `tdate`: a date in date-time notation as defined by RFC 3339, section 5.6 (e.g., 2017-07-21T17:32:28Z)
+            - `bool`: a boolean value
+            - `cbor`: CBOR encoded data
+            - `driving-privileges`: represents driving privileges format
+            - `iso-23220-birthdate`: birthdate in ISO-23220 format
+        output_identifier:
+          type: string
+          description: |
+            The field describes the output identifier of the value to set. Required if `deducted` is omitted.
+        presence:
+          type: string
+          enum:
+            - M
+            - O
+          description: |
+            The presence of the claim. Possible values are:
+            - `M`: Mandatory
+            - `O`: Optional
+      required:
+        - format
+        - presence
+      description: Defines a claim parsing template used for mapping claims in the parsing process.
+
+    VpTokenParsed :
+      type: object
+      additionalProperties: true 
+      example: 
+        birth_city: "Paris"
+        birth_country: "FR"
+        birth_country_cog: "75000"
+        birth_country_label: "1er Arrondissement"
+        birth_date: "1987-01-24"
+        birth_place_cog: "75000"
+        birth_place_label: "Paris"
+        birth_state: "Île-de-France"
+        email: "johndoe@email.com"
+        family_name: "Doe"
+        gender: 1
+        given_name: "John"
+        portrait: "AAAA..."
+        preferred_username: "John"
+        

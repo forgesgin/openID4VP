@@ -1,0 +1,28 @@
+openapi: 3.0.3
+
+info:
+  version: 1.0.0
+  title: Idakto API common types and structures
+  description: |
+    This OpenAPI Specification file contains all Idakto common types and structures used by the API of the microservices
+    
+paths: {}
+
+components:
+  schemas:
+    Error:
+      required:
+        - timestamp
+        - status
+        - error
+        - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
