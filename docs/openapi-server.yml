@@ -647,74 +647,18 @@ components:
         For JAR, some field are added according to [RFC9101]
         Note: The request is not encrypted so no field  request_object_encryption_alg and request_object_encryption_enc defined in RFC9101 are set
       properties:
-        redirect_uris:
-          type: array
-          items:
-            type: string
-        token_endpoint_auth_method:
-          type: string
-          enum:
-            - "none"
-            - "client_secret_post"
-            - "client_secret_basic"
-        grant_types:
-          type: array
-          items:
-            type: string
-        response_types:
-          type: array
-          items:
-            type: string
-            enum:
-              - vp_token
-        client_name:
-          type: string
-        client_uri:
-          type: string
-          format: uri
-        logo_uri:
-          type: string
-          format: uri
-        scope:
-          type: string
-        contacts:
-          type: array
-          items:
-            type: string
-        tos_uri:
-          type: string
-          format: uri
-        policy_uri:
-          type: string
-          format: uri
-        jwks_uri:
-          type: string
-          format: uri
         jwks:
           type: array
           items:
             $ref: "#/components/schemas/JWK"
-        software_id:
-          type: string
-          format: uuid
-        software_version:
-          type: string
         vp_formats:
           $ref: "#/components/schemas/VPFormats"
-        client_id_scheme:
-          $ref: "#/components/schemas/ClientIdScheme"
-        request_object_signing_alg:
-          type: array
-          items:
-            type: string
-            enum:
-              - ES256
-              - ES384
-              - ES512
-              - PS256
-              - PS384
-              - PS512
-              -
+        authorization_signed_response_alg:
+          type: string
+        authorization_encrypted_response_alg:
+          type: string
+        authorization_encrypted_response_enc:
+          type: string
     ResponseFetchData:
       type: object
       properties:
